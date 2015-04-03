@@ -117,6 +117,7 @@ vHostTemplate="$(echo "
 		AllowOverride all
 		Order allow,deny
 		allow from all
+        Require all granted
 	</Directory>
 
 	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
