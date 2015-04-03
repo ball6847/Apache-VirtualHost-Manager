@@ -46,7 +46,7 @@ OPTIND=1
 
 sitesEnabled="/etc/apache2/sites-enabled/"
 sitesAvailable="/etc/apache2/sites-available/"
-apacheWWW="/var/www/"
+apacheWWW=${APACHE_WWW_DIR:-"/var/www/"}
 
 while getopts "a:e:w:n:d:vh" opt; do
 	case "$opt" in
@@ -107,12 +107,12 @@ vHostTemplate="$(echo "
 	ServerAdmin $email 
 	ServerAlias $domainname www.$domainname
 	ServerName $domainname
-	DocumentRoot /var/www/$dirname
+	DocumentRoot ${apacheWWW}$dirname
 	<Directory />
 		Options FollowSymLinks
 		AllowOverride None
 	</Directory>
-	<Directory /var/www/$dirname>
+	<Directory ${apacheWWW}$dirname>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride all
 		Order allow,deny
@@ -127,13 +127,13 @@ vHostTemplate="$(echo "
 		Allow from all
 	</Directory>
 
-	ErrorLog ${APACHE_LOG_DIR}/error.log
+	ErrorLog ${APACHE_LOG_DIR}/${domainname}-error.log
 
 	# Possible values include: debug, info, notice, warn, error, crit,
 	# alert, emerg.
 	LogLevel warn
 
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
+	CustomLog ${APACHE_LOG_DIR}/${domainname}-access.log combined
 </VirtualHost>")"
 
 function verbose() {
@@ -165,12 +165,12 @@ if [ $action == "create" ]; then
 	fi
 	
 	# sets www-data permission
-	if chown -R www-data:www-data $apacheWWW$dirname > /dev/null; then
-		verbose "Folder permission changed"
-	else 
-		echo "An error occurred while changing permission to "$dirname""
-		exit 1
-	fi
+	#if chown -R www-data:www-data $apacheWWW$dirname > /dev/null; then
+		#verbose "Folder permission changed"
+	#else 
+		#echo "An error occurred while changing permission to "$dirname""
+		#exit 1
+	#fi
 	
 	# creates VirtualHost file
 	if echo "$vHostTemplate" > $sitesAvailable$vhostname.conf; then
